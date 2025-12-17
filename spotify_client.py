@@ -5,6 +5,8 @@ import os
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
+import appdirs
+import pathlib
 
 load_dotenv()
 
@@ -17,7 +19,14 @@ class SpotifyClient:
             raise ValueError("Spotify credentials not found in .env file")
         
         scope = "user-read-currently-playing user-read-playback-state"
-        cache_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.spotify_cache')
+        
+        # More robust cache handling
+        app_name = "LyricsOverlay"
+        app_author = "YourAppName" # Or your name
+        cache_dir = appdirs.user_cache_dir(app_name, app_author)
+        pathlib.Path(cache_dir).mkdir(parents=True, exist_ok=True)
+        cache_path = os.path.join(cache_dir, '.spotify_cache')
+
         self.sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
             client_id=self.client_id,
             client_secret=self.client_secret,
